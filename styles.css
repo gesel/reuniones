@@ -1,0 +1,27 @@
+h1 {
+  font-size: 30px;
+}
+h1.title {
+  font-size: 34px;
+}
+h2 {
+  font-size: 26px;
+}
+h3 {
+  font-size: 20px;
+}
+h4 {
+  font-size: 16px;
+}
+h5 {
+  font-size: 14px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+} 
+blockquote {
+  font-size: 12px;
+}
