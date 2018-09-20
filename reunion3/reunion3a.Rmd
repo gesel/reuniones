@@ -1,0 +1,282 @@
+---
+author: Federico Alvarez y Santiago Gualchi
+title: Visualización de datos en R
+date: 20 de septiembre de 2018
+email: santiagogualchi@gmail.com
+bibliography: bibliografia.bib
+lang: es
+output:
+  html_document:
+    number_sections: yes
+    theme: yeti
+    css: ../styles.css
+nocite: |
+  @r4ds2017
+--- 
+
+# Introducción
+
+La idea de esta sección es tomar un primer contacto con R y su sintaxis. Para eso, vamos a ver cómo plotear gráficos en R usando el paquete `ggplot2`. `ggplot2` es uno de los miembros principales de tidyverse. Por eso, para usar este paquete lo primero que tenemos que hacer es instalar tidyverse en nuestras computadora (si no lo tenemos instalado todavía) usando la función `install.packages()` y luego lo cargamos usando la función `library`:
+
+```{r message = FALSE, warning = FALSE}
+#install.packages("tidyverse")
+library(tidyverse)
+```
+
+Además vamos a instalar el paquete del GESEL:
+
+```{bash message = FALSE, results = 'hide'}
+R CMD INSTALL ../../packages/gesel/gesel_0.1.tar.gz
+
+```
+
+Y a cargarlo:
+
+```{r message = FALSE}
+library(gesel)
+```
+
+# Creación de un ggplot
+
+En esta breve introducción no nos vamos a ocupar tanto de la semántica de la función `ggplot()` o del operador `+`, sino más bien de la sintaxis necesaria para plotear gráficos. Pero antes de empezar a plotear nada, es necesario entender el dataset con el que estamos trabajando. Para los siguientes ejemplos vamos a usar `comprension`, que es un dataset del paquete gesel con resultados de pruebas de lectura tomadas a estudiantes de 6° ESS. La función `data()` nos va a permitir cargar este dataset en nuestra sesión y la función `head()` nos muestra (por defecto) las primeras 6 filas de un *data frame*.
+
+```{r}
+data("comprension")
+head(comprension)
+```
+
+En la tabla vemos las primeras 6 observaciones del dataset. La variable `Scr.Tiempo` contiene el tiempo empleado por los sujetos para completar una prueba de comprensión lectora y la variable `Tecle.Correctas` contiene la cantidad de respuestas correctas obtenidas por los sujetos en una prueba de eficacia lectora.
+
+Ahora sí vamos a plotear nuestro primer *scatterplot* (o diagrama de dispersión) de la velocidad de lectura (`Scr.Tiempo`) en función de la eficacia lectora (`Tecle.Correctas`):
+
+```{r warning = FALSE}
+ggplot(data = comprension) +
+  geom_point(mapping = aes(x = Tecle.Correctas, y = Scr.Tiempo))
+```
+
+Para crear nuestro gráfico, lo primero que hacemos es invocar a la función `ggplot()` que se encarga de crear el sistema de coordenadas apropiado para el dataset que recibe como argumento `data`. Después añadimos una **capa** de puntos usando la función `geom_point()`. `geom_point()` es una función *geom*, como también lo son `geom_smooth()` y `geom_bar()`, entre otras. Cada función *geom* crea un tipo de gráfico distinto. En nuestro caso, `geom_point()` plotea un *scatterplot*.
+
+Lo siguiente a observar en el código invocado es el parámetro `mapping`. Cada función *geom* toma un argumento `mapping` que define cómo van a ser mapeadas nuestras variables a propiedades visuales. Los *geoms* siempre toman un *aesthetic mapping* creado por `aes()` como el valor para `mapping`. `aes()` especifica las propiedades estéticas del gráfico, lo cual incluye las coordenadas donde se van a plotear, en este caso, los puntos. Pasamos las coordenadas relevantes a través de los argumentos `x` e `y` de `aes()`.
+
+A lo largo de esta sección vamos a ver las distintas opciones que nos ofrece ggplot2 para ajustar nuestros gráficos. Podemos resumir la sintaxis de ggplot2 en la siguiente plantilla, que vamos a analizar paso a paso:
+
+```
+ggplot(data = <DATA>) +
+  <GEOM_FUNCTION>(
+    mapping = aes(<MAPPINGS>),
+    stat = <STAT>,
+    position = <POSITION>
+  ) + 
+  <COORDINATE_FUNCTION> +
+  <FACET_FUNCTION>
+```
+
+# Mappings
+
+Para graficar nuestras variables usamos *aesthetics*. Ya usamos dos en el gráfico anterior: `x` e `y`. En ese caso, pasamos nuestra variable independiente al parámetro `x` y nuestra variable dependiente al parámetro `y`, pero podemos representar una tercera variable usando otro *aesthetic*. `ggplot2`va a asignar automáticamente un valor único del *aesthetic* para cada nivel de la variable:
+
+```{r, warning = FALSE}
+# Representando el máximo nivel educativo alcanzado por la madre con colores.
+ggplot(data = comprension) +
+  geom_point(mapping = aes(x = Tecle.Correctas, y = Scr.Tiempo, color = Esc.Madre))
+```
+
+```{r, warning = FALSE}
+# Representando cantidad de respuestas correctas en el Screening con tamaños.
+ggplot(data = comprension) +
+  geom_point(mapping = aes(x = Tecle.Correctas, y = Scr.Tiempo, size = Scr.Correctas))
+```
+
+```{r, warning = FALSE}
+# Representando cantidad de respuestas correctas en el Screening con tranparencias.
+ggplot(data = comprension) +
+  geom_point(mapping = aes(x = Tecle.Correctas, y = Scr.Tiempo, alpha = Scr.Correctas))
+```
+
+```{r, warning = FALSE}
+# Representando escuela con formas.
+ggplot(data = comprension) +
+  geom_point(mapping = aes(x = Tecle.Correctas, y = Scr.Tiempo, shape = Escuela))
+```
+
+Como vimos en los ejemplos, una vez que seleccionamos un *aesthetic*, `ggplot2` se encarga del escalado de sus valores por nosotros.
+
+# Facets
+
+Ya vimos como agregar una tercera variable usando *aesthetics*. Otra posibilidad (especialmente útil cuando se trata de una variable discreta) consiste en plotear una serie de gráficos. `ggplot2` nos permite dividir nuestro gráfico en *facets*. Para *facetar* nuestro ploteo, vamos a usar la función `facet_wrap()`. Como primer argumento vamos a pasar una fórmula que contenga nuestra variable relevante, y como argumento `nrow` vamos a pasar el número de filas:
+
+```{r, warning = FALSE}
+ggplot(data = comprension) +
+  geom_point(mapping = aes(x = Tecle.Correctas, y = Scr.Tiempo)) +
+  facet_wrap(~ Esc.Madre, nrow = 2)
+```
+
+Si queremos facetar nuestro ploteo de acuerdo a dos variables, vamos a usar la función `facet_grid()`, que toma como argumento una fórmula que contiene dos variables:
+
+```{r, warning = FALSE}
+ggplot(data = comprension) +
+  geom_point(mapping = aes(x = Tecle.Correctas, y = Scr.Tiempo)) +
+  facet_grid(Escuela ~ Esc.Madre)
+``` 
+
+# Objetos geométricos
+
+Como ya adelantamos, `ggplot2` provee numerosos *geoms*. Un *geom* es el objeto geométrico que se usa para representar los valores relevantes. Para cambiar el *geom*, tenemos que cambiar la función *geom*:
+
+```{r, warning = FALSE}
+# Scatterplot:
+ggplot(data = comprension) +
+  geom_point(mapping = aes(x = Tecle.Correctas, y = Scr.Tiempo))
+```
+
+```{r, message = FALSE, warning = FALSE}
+# Smoothed conditional means:
+ggplot(data = comprension) +
+  geom_smooth(mapping = aes(x = Tecle.Correctas, y = Scr.Tiempo))
+```
+
+No todos los *aesthetics* funcionan con todos los *geoms*. Por ejemplo, no podemos usar `shape` sobre una línea. En su lugar, podemos usar `linetype`:
+
+```{r, message = FALSE, warning = FALSE}
+ggplot(data = comprension) +
+  geom_smooth(mapping = aes(x = Tecle.Correctas, y = Scr.Tiempo, linetype = Escuela))
+```
+
+Si queremos mostrar distintos *geoms* en un mismo ploteo, los añadimos usando el operador `+` y `ggplot2` se va a ocupar de plotear cada *geom* sobre una capa distinta:
+
+```{r, message = FALSE, warning = FALSE}
+ggplot(data = comprension) +
+  geom_point(mapping = aes(x = Tecle.Correctas, y = Scr.Tiempo)) +
+  geom_smooth(mapping = aes(x = Tecle.Correctas, y = Scr.Tiempo))
+```
+
+Un buen hábito en programación consiste en reducir lo más posible el código repetido. De esta forma escribimos código que es más fácil de leer y menos propenso a errores cuando hacemos algún cambio. Podemos reducir el código duplicado pasando `mapping` como un argumento global para nuestro objeto `ggplot`:
+
+```{r, message = FALSE, warning = FALSE}
+ggplot(data = comprension, mapping = aes(x = Tecle.Correctas, y = Scr.Tiempo)) +
+  geom_point() +
+  geom_smooth()
+```
+
+El valor de `mapping` en la función `ggplot()` será considerado el valor por defecto para todos los *geoms*, pero nosotros podemos especificar aún más cada *geom*:
+
+```{r, message = FALSE, warning = FALSE}
+ggplot(data = comprension, mapping = aes(x = Tecle.Correctas, y = Scr.Tiempo)) +
+  geom_point(mapping = aes(color = Escuela)) +
+  geom_smooth()
+```
+
+# Transformaciones estadísticas
+
+`geom_point()` trabaja con nuestros datos "crudos", pero otros *geoms* transforman nuestros datos antes de plotear. `geom_bar()`, por ejemplo, plotea un diagrama de barras donde el eje *y* representa la cantidad de observaciones para un determinado nivel de la variable independiente:
+
+```{r, warning = FALSE}
+ggplot(data = comprension) +
+  geom_bar(mapping = aes(x = Scr.Correctas))
+```
+
+El algoritmo usado para calcular valores nuevos para un gráfico se llama *stat* (forma corta de *statistical transformation*). Cada *geom* tiene un *stat* por defecto y cada *stat* tiene un *geom* por defecto. El *stat* por defecto para `geom_bar()` es `stat_count()` y el *geom* por defecto para `stat_count()` es `geom_bar()`. Por eso, podemos recrear el gráfico de recién usando `stat_count()` en lugar de `geom_bar()`:
+
+```{r, warning = FALSE}
+ggplot(data = comprension) +
+  stat_count(mapping = aes(x = Scr.Correctas))
+```
+
+`stat_summary()`, por ejemplo, resume los valores de *y* para cada valor de *x*. Por ejemplo, el siguiente código resume los valores del tiempo de resolución del Screening, para cada nivel de la variable de escolaridad de la madre:
+
+```{r, warning = FALSE}
+ggplot(data = comprension) +
+  stat_summary(
+  mapping = aes(x = Esc.Madre, y = Scr.Tiempo),
+  fun.ymin = min,
+  fun.ymax = max,
+  fun.y = median
+  )
+```
+
+# Posiciones
+
+Para colorear un diagrama de barras, vamos a usar el *aesthetic* `fill`:
+
+```{r, warning = FALSE}
+ggplot(data = comprension) +
+  geom_bar(mapping = aes(x = Esc.Madre, fill = Esc.Madre))
+```
+
+A su vez, podemos pasar una tercera variable como valor de `fill`:
+
+```{r, warning = FALSE}
+ggplot(data = comprension) +
+  geom_bar(mapping = aes(x = Scr.Correctas, fill = Orig.Madre))
+```
+
+El *stacking* ocurre de forma automática según el valor del argumento `position`:
+
+```{r, warning = FALSE}
+ggplot(data = comprension) +
+  geom_bar(
+    mapping = aes(x = Scr.Correctas, fill = Orig.Madre),
+    position = "fill"
+  )
+```
+
+```{r, warning = FALSE}
+ggplot(data = comprension) +
+  geom_bar(
+    mapping = aes(x = Scr.Correctas, fill = Orig.Madre),
+    position = "dodge"
+  )
+```
+
+# Sitemas de coordenadas
+
+El sistema de coordenadas por defecto es el sistema de coordenadas cartesiano, pero existen otros sistemas de coordenadas que, en ocasiones, pueden resultar útiles:
+
+```{r, warning = FALSE}
+# Si bien no es el caso, rotar los ejes x e y, como hacemos en este gráfico,
+# resulta especialmente útil cuando nuestras etiquetas son muy largas. En estos
+# casos, si ploteamos las etiquetas bajo el eje x, lo más probable es que las
+# etiquetas se superpongan.
+ggplot(data = comprension, mapping = aes(x = Esc.Madre, y = Scr.Tiempo)) +
+  geom_boxplot() +
+  coord_flip()
+```
+
+```{r, message = FALSE}
+ar <- map_data("world", region=c("arg", "falk", "south georgia", "south sandwich"))
+
+ggplot(ar, aes(long, lat, group = group)) +
+  geom_polygon(fill = "white", color = "black") + 
+  coord_quickmap()
+```
+
+```{r, warning = FALSE}
+ggplot(data = comprension) +
+  geom_bar(
+    mapping = aes(x = Esc.Madre, fill = Esc.Madre),
+    show.legend = FALSE,
+    width = 1
+  ) +
+  theme(aspect.ratio = 1) +
+  labs(x = NULL, y = NULL) +
+  coord_polar()
+```
+
+# Conclusión
+
+`ggplot2` es un paquete muy versátil que nos permite ajustar los gráficos a nuestras necesidades siguiendo una sintaxis muy simple, que repetimos a continuación:
+
+```
+ggplot(data = <DATA>) +
+  <GEOM_FUNCTION>(
+    mapping = aes(<MAPPINGS>),
+    stat = <STAT>,
+    position = <POSITION>
+  ) + 
+  <COORDINATE_FUNCTION> +
+  <FACET_FUNCTION>
+```
+
+En total son 7 los parámetros que podemos ajustar para personalizar nuestros gráficos, pero en la práctica son raras las veces en las que necesitamos especificar los 7 parámetros. `ggplot2` provee opciones por defecto útiles, pero si necesitamos cambiar algo siempre podemos hacerlo.
+
+# Bibliografía consultada

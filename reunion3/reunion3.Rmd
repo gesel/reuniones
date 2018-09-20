@@ -1,281 +1,221 @@
 ---
-author: Federico Álvarez y Santiago Gualchi
-title: Visualización de datos en R
-date: 20 de septiembre de 2018
-email: santiagogualchi@gmail.com
+title: "Introducción a R, estadística descriptiva y visualización exploratoria de datos"
+author: "Federico Alvarez y Santiago Gualchi"
+date: "20 de septiembre de 2018"
+email: federicoalvarez.puan@gmail.com, santiagogualchi@gmail.com
 bibliography: bibliografia.bib
 lang: es
 output:
   html_document:
-    number_sections: yes
     theme: yeti
     css: ../styles.css
 nocite: |
   @r4ds2017
---- 
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
 
 # Introducción
 
-La idea de esta sección es tomar un primer contacto con R y su sintaxis. Para eso, vamos a ver cómo plotear gráficos en R usando el paquete `ggplot2`. `ggplot2` es uno de los miembros principales de tidyverse. Por eso, para usar este paquete lo primero que tenemos que hacer es instalar tidyverse en nuestras computadora (si no lo tenemos instalado todavía) usando la función `install.packages()` y luego lo cargamos usando la función `library`:
+Para poder analizar cualquier conjunto de datos es necesario representarlos de una manera que permita comprender la información que contienen de forma sintética. Para ese propósito, dos procedimientos comunes a todo análisis estadístico son el empleo de estadísticos descriptivos y la representación visual de las muestras. Mientras que la estadística descriptiva condensa los detalles de las observaciones puntuales en una cantidad finita, manejable, de valores informativos, la visualización de los datos permite contemplar la distribución de las variables de estudio en la totalidad de la muestra, permitiendo observar patrones de manera intuitiva.
+Estas dos herramientas se relacionan entre sí en función de los tipos de variables a representar, y se complementan a la hora de interpretarse: hay parámetros de las representaciones gráficas que se definen en función de estadísticos descrptivos, y a su vez la visualización frecuentemente facilita la interpretación de los valores descriptivos.
+En el marco de las reuniones de este grupo, este texto pretende complementar la exposición teórica sobre la estadística descriptiva con un andamiaje básico de programación y con los pasos a seguir para computar los estadísticos relevantes, así como con los conceptos básicos para permitir la exploración visual de conjuntos de datos.
 
-```{r message = FALSE, warning = FALSE}
-install.packages("tidyverse")
-library(tidyverse)
-```
+# Empezando a programar
 
-Además vamos a instalar el paquete del GESEL:
+Básicamente, un lenguaje de programación es un conjunto de reglas sintácticas que permiten proporcionarle instrucciones a una computadora, junto con un vocabulario básico para este fin. En este sentido, toda tarea de programación supone encontrar una secuencia de pasos que permita llevar a cabo la tarea deseada y su subsecuente expresión en la sintaxis de algún lenguaje. Tanto la visualización como el análisis numérico de los datos se efectúan de manera programática. Para eso resulta fundamental el manejo de herramientas computacionales que permitan llevar a cabo los cálculos y las representaciones visuales. Hay varias herramientas disponibles para el análisis de datos que suponen distintos niveles de comprensión de los mecanismos subyacentes al análisis. Frente a los programas de estilo 'point-and-click' como SAS, SPSS o Stata (o Microsoft Excel, también), los lenguajes de programación ofrecen un grado mayor de control sobre la lógica del análisis, además de permitir la realización de una gama de tareas mucho más amplia. Si bien aprender la lógica de un lenguaje de programación requiere de una práctica específica para ese fin, el control sobre el proceso de análisis es mucho mayor, además de abrir la puerta a la realización de una enorme variedad de tareas.
+    
+## Algunas consideraciones sobre R 
 
-```{bash message = FALSE, results = 'hide'}
-R CMD INSTALL ../../packages/gesel/gesel_0.1.tar.gz
-```
+Cada lenguaje de programación tiene formas de representación de información que le son propias, llamadas estructuras de datos. Cada estructura de datos conforma una categoría sobre la cual se pueden realizar diferentes operaciones. Las estructuras propias de R que nos importan en este momento son números, caracteres, vectores, data frames y factores. 
+La idea es sencilla: uno puede multiplicar 3 por 4, pero no la letra 'a' por la letra 'b'. Cada tipo de dato puede ser afectado por un conjunto de operaciones que le son propias. El tipo de dato sobre el cual depende la gran mayoría de las operaciones que se realizan en R es el vector, que consiste básicamente en una secuencia de elementos de un mismo tipo, así es posible tener vectores que consisten de secuencias de números o de secuencias de caracteres. 
 
-Y a cargarlo:
+Otro tipo de dato de importancia es el factor, que consiste en una lista finita de valores fijos mutuamente excluyentes. Esto significa que mientras que el tipo de dato 'caracter' sirve para codificar variables categóricas como el nombre de un sujeto, el factor se utiliza para clasificar grupos, por ejemplo 'ancianos', 'adultos' y niños.
+Esto nos lleva a un punto importante que es que los tipos de datos tienen una relación importante con los tipos de variables que se utilizan para realizar un estudio, y diferentes formas de operacionalización tienen consecuencias directas en el modo en el que el lenguaje interpreta los datos.
 
-```{r message = FALSE}
-library(gesel)
-```
-
-# Creación de un ggplot
-
-En esta breve introducción no nos vamos a ocupar tanto de la semántica de la función `ggplot()` o del operador `+`, sino más bien de la sintaxis necesaria para plotear gráficos. Pero antes de empezar a plotear nada, es necesario entender el dataset con el que estamos trabajando. Para los siguientes ejemplos vamos a usar `comprension`, que es un dataset del paquete gesel con resultados de pruebas de lectura tomadas a estudiantes de 6° ESS. La función `data()` nos va a permitir cargar este dataset en nuestra sesión y la función `head()` nos muestra (por defecto) las primeras 6 filas de un *data frame*.
+Para programar, sin embargo, rara vez manejamos datos en el vacío. En general se los retiene en la memoria de la computadora durante la ejecución del programa de forma tal que cada dato esté disponible para diferentes procesos. Estos sectores de memoria son lo que en programación se llama **variable**. Si bien los conceptos están relacionados, es importante no confundir las variables que forman parte del diseño de un estudio cuantitativo con las estructuras de almacenamiento en memoria que forman parte de un programa. En R las variables se crean al asignarle un nombre a un valor, de la siguiente manera:
 
 ```{r}
-data("comprension")
-head(comprension)
+var_numerica <- 100
+print(var_numerica)
+
+var_caracter <- 'cien'
+print(var_caracter)
+
+var_vector <- c(var_numerica, var_caracter)
+print(var_vector)
+
+var_factor <- factor(var_vector)
+print(var_factor)
+```
+También podemos ver que hay otros componentes en el código de arriba: `<-`, `c()`, `print()` y `factor()`. En el caso de `<-` se trata de un constructo que se llama **operador**. Como su nombre lo indica, sirven para realizar operaciones. En este caso, se trata de una operación de **asignación de variable** (que vamos a usar muchísimo y puede escribirse con el atajo de teclado 'alt' + '-'). Otros operadores son, por ejemplo, `+`, `-`, `*` y `/`, pero no se limita a operaciones matemáticas, sino que hay un gran número de ellos que sirven para realizar diferentes tipos de tareas.
+Los nombres seguidos de paréntesis, por otro lado, indican que estamos ante una función. En términos escuetos, una función es un procedimiento que toma un conjunto de valores, llamados **argumentos** y devuelve un objeto que resulta de aplicar una serie de procesos sobre dichos valores. La función `c()` toma una secuencia de elementos y devuelve un vector compuesto por ellos. La función `factor()` toma un vector y lo convierte en un factor. La función `print()` toma variables o valores aislados y los imprime en pantalla.
+
+Desde luego, para hacer análisis estadísticos necesitamos un grado de complejidad mayor en nuestros datos y nuestros procesos. En general, en un análisis el tipo de dato que más nos va a importar se llama **data frame**. Un data frame es, básicamente, una tabla. Las filas son observaciones individuales mientras que las columnas son variables bajo análisis.
+R incluye algunos datos por defecto que podemos utilizar para probar nuestro código. Este es el dataset iris, al que puede accederse con sólo poner `iris` en la consola. Al incluir la función 'head()' estamos diciéndole a R que sólo queremos las primeras observaciones del dataset.
+```{r}
+head(iris)
+```
+Este dataset incluye mediciones sobre flores, pero se supone que sin importar el tipo de dato, el formato de carga es similar.
+Volvamos un momento sobre la función `head()`. Nosotres podríamos querer ver más que sólo los primeros seis registros que la función arroja por defecto. Podemos comunicarle esto a R ingresando un valor numérico dentro de la función.
+```{r}
+head(iris, 10)
+```
+Esto nos muestra que no todos los argumentos de una función son obligatorios, sino que hay argumentos opcionales. Cada función tiene su propio conjunto de argumentos obligatorios y/o opcionales. En el caso de arriba los argumentos fueron empleados sin referirse a sus nombres porque se enunciaron en el orden prestablecido, pero también es posible invertir el orden y llamarlos de manera explícita.
+```{r}
+head(n = 3, x = iris)
+```
+Hay veces, incluso, que algunos argumentos opcionales se hallan definidos por defecto y su valor sólo puede modificarse de manera explícita al ejecutar la función.
+
+Más allá de las funcionalidades que provee R por defecto, el lenguaje puede ampliarse. Cuando une usuarie o grupo escribe código que permite realizar de manera más sencilla un procedimiento determinado, puede organizarlo y compartirlo en forma de **librería** o paquete. Las librerías son conjuntos de funciones y tipos de datos creados por usuario que extienden las capacidades del lenguaje de programación.
+
+Esto nos resulta de importancia por una serie de razones. La primera es que muchísimos análisis estadísticos se hallan disponibles en librerías, pero no forman parte del núcleo básico de R, con lo cual para llevarlos a cabo es necesario descargar la librería en cuesión o programar a mano la lógica del análisis. En la medida de lo posible, vamos a evitar hacer a mano lo que otras personas ya hayan hecho mejor que nosotres. En segundo lugar, ocurre que los criterios de diseño de código varían entre programadores, con lo cual hay variaciones en el modo en el que las librerías nombran a las clases y funciones, la forma en la que se definen los argumentos, y la propia manera en la que se ejectuan los análisis. En nuestras reuniones vamos a procurar emplear el conjunto de librerías llamado **tidyverse**, cuya sintaxis es levemente diferente a la de R básico y que emplea tipos de datos adicionales. En particular, nos importa la clase **tibble**, que vamos a usar en lugar del data frame que viene por defecto con R. Si bien las diferencias entre un tibble y un data frame no son aparentes, en realidad tibble es una extensión del data frame: puede hacer todo lo que se hace con data frame común, y algunas cosas más.
+
+Para instalar una librería en R es necesario correr desde la consola la función `install.packages('NOMBRE DE LA LIBRERÍA)`, la cual se ocupa de buscar en línea el paquete, descargarlo e instalar todas sus dependencias. Luego, para incorporar la funcionalidad de la librería al análisis que estemos llevando a cabo, la llamamos explícitamente en la parte superior de nuestro código. Eso nos permitirá emplear sus recursos de manera inmediata.
+
+```{r}
+library(tidyverse)
+
+tbl_iris <- as_tibble(iris)
+
+print(tbl_iris)
 ```
 
-En la tabla vemos las primeras 6 observaciones del dataset. La variable `Scr.Tiempo` contiene el tiempo empleado por los sujetos para completar una prueba de comprensión lectora y la variable `Tecle.Correctas` contiene la cantidad de respuestas correctas obtenidas por los sujetos en una prueba de eficacia lectora.
+Cuando nosotros miramos un data frame podemos querer obtener información sobre una columna individual. Por ejemplo, podemos observar la columna 'Petal.Length' de nuestro tbl_iris.
+```{r}
+tbl_iris$Petal.Length
+```
+Como vemos, esto nos devuelve un vector con los valores de esa variable para cada observación. Si nosotros quisiéramos promediar el valor de esta variable entre observaciones empleando la sintaxis normal de R, haríamos lo siguiente:
+```{r}
+mean(tbl_iris$Petal.Length)
+```
+Si luego quisiéramos ver el promedio del largo del pétalo para cada especie de iris (setosa, versicolor y virginica), tendríamos que hacer lo siguiente:
+```{r}
+mean(tbl_iris[tbl_iris$Species == 'setosa',]$Petal.Length)
+mean(tbl_iris[tbl_iris$Species == 'versicolor',]$Petal.Length)
+mean(tbl_iris[tbl_iris$Species == 'virginica',]$Petal.Length)
+```
+El código de tidyverse es, en cambio, un tanto más organizado y fácil de seguir:
+```{r}
+tbl_iris %>% 
+    group_by(Species) %>%
+    summarise(promedio_PetalLength = mean(Petal.Length))
+```
+El operador `%>%` ('Ctrl' + 'Shift' + 'M') permite encadenar operaciones y si agregamos un operador de asignación al código de recién, podemos tener un nuevo tibble con los datos que nos resultan de interés.
+```{r}
+tbl_promedio_PetalLength <- tbl_iris %>% 
+    group_by(Species) %>%
+    summarise(promedio_PetalLength = mean(Petal.Length))
+```
+Esto se vuelve particularmente relevante si queremos computar varias cosas de manera organizada. ¿Cómo se les ocurre que sería el código de R base para lo siguiente?
+```{r}
+tbl_resumen <- tbl_iris %>% 
+    group_by(Species) %>%
+    summarise(promedio_PetalLength = mean(Petal.Length),
+              sd_PetalLength = sd(Petal.Length),
+              promedio_SepalLength = mean(Sepal.Length),
+              sd_SepalLength = sd(Sepal.Length))
 
-Ahora sí vamos a plotear nuestro primer *scatterplot* (o diagrama de dispersión) de la velocidad de lectura (`Scr.Tiempo`) en función de la eficacia lectora (`Tecle.Correctas`):
-
-```{r warning = FALSE}
-ggplot(data = comprension) +
-  geom_point(mapping = aes(x = Tecle.Correctas, y = Scr.Tiempo))
+print(tbl_resumen)
 ```
 
-Para crear nuestro gráfico, lo primero que hacemos es invocar a la función `ggplot()` que se encarga de crear el sistema de coordenadas apropiado para el dataset que recibe como argumento `data`. Después añadimos una **capa** de puntos usando la función `geom_point()`. `geom_point()` es una función *geom*, como también lo son `geom_smooth()` y `geom_bar()`, entre otras. Cada función *geom* crea un tipo de gráfico distinto. En nuestro caso, `geom_point()` plotea un *scatterplot*.
-
-Lo siguiente a observar en el código invocado es el parámetro `mapping`. Cada función *geom* toma un argumento `mapping` que define cómo van a ser mapeadas nuestras variables a propiedades visuales. Los *geoms* siempre toman un *aesthetic mapping* creado por `aes()` como el valor para `mapping`. `aes()` especifica las propiedades estéticas del gráfico, lo cual incluye las coordenadas donde se van a plotear, en este caso, los puntos. Pasamos las coordenadas relevantes a través de los argumentos `x` e `y` de `aes()`.
-
-A lo largo de esta sección vamos a ver las distintas opciones que nos ofrece ggplot2 para ajustar nuestros gráficos. Podemos resumir la sintaxis de ggplot2 en la siguiente plantilla, que vamos a analizar paso a paso:
-
-```
-ggplot(data = <DATA>) +
-  <GEOM_FUNCTION>(
-    mapping = aes(<MAPPINGS>),
-    stat = <STAT>,
-    position = <POSITION>
-  ) + 
-  <COORDINATE_FUNCTION> +
-  <FACET_FUNCTION>
+Vale aclarar que es posible ejecutar código de tidyverse empleando la sintaxis normal de R en vez de la sugerida arriba, sin embargo preferimos la opción que mostramos porque muestra de manera más clara la secuencia de pasos, mientras que la variante de aquí abajo muestra la llamada a diferentes funciones en un orden inverso al de la ejecución real.
+```{r}
+tbl_resumen <- summarise(group_by(tbl_iris, Species),
+                         promedio_PetalLength = mean(Petal.Length),
+                         sd_PetalLength = sd(Petal.Length),
+                         promedio_SepalLength = mean(Sepal.Length),
+                         sd_SepalLength = sd(Sepal.Length))
 ```
 
-# Mappings
 
-Para graficar nuestras variables usamos *aesthetics*. Ya usamos dos en el gráfico anterior: `x` e `y`. En ese caso, pasamos nuestra variable independiente al parámetro `x` y nuestra variable dependiente al parámetro `y`, pero podemos representar una tercera variable usando otro *aesthetic*. `ggplot2`va a asignar automáticamente un valor único del *aesthetic* para cada nivel de la variable:
+# Visualización
 
-```{r, warning = FALSE}
-# Representando el máximo nivel educativo alcanzado por la madre con colores.
-ggplot(data = comprension) +
-  geom_point(mapping = aes(x = Tecle.Correctas, y = Scr.Tiempo, color = Esc.Madre))
+
+Para los ejemplos que siguen, vamos a usar datos extraídos de la librería _languageR_, así que si no la tienen instálenla con `install.packages()`. Vamos a elegir el dataset _regularity_ contenido en esta librería.
+```{r}
+library(languageR)
+
+tbl_regularity <- as_tibble(regularity)
+
+tbl_regularity
+```
+Como podemos ver, este dataset contiene información sobre verbos del neerlandés. Los campos son:
+* Verb: contiene el verbo en infinitivo.
+* WrittenFrequency: contiene el logaritmo de la frecuencia del verbo.
+* FamilySize: se supone que contiene la cantidad de types en la familia morfológica del verbo, pero no parece ser eso porque contiene un número decimal.
+* LengthInLetters: la cantidad de letras de la forma ortográfica de la raíz del verbo.
+* VerbalSynsets: la cantidad de synsets verbales a los que pertenece en WordNet.
+* MeanBigramFrequency: promedio del logaritmo de la frecuencia en bigramas.
+* NcountStem: cantidad de vecinos ortográficos.
+* Regularity: si el verbo es regular o irregular.
+* InflectionalEntropy: entropía de Shannon calculada para las variantes flexivas del verbo.
+* Auxiliary: el auxiliar que toma para los tiempos perfectos.
+* Valency: la cantidad de argumentos que toma.
+* NVratio: el logaritmo de la proporción entre los usos nominales y los verbales.
+* WrittenSpokenRatio: logaritmo de la proporción de la frecuencia de uso entre el neerlandés escrito y hablado.
+
+
+La información más sencilla para observar en un dataset es la frecuencia de los valores de una variable. Por ejemplo, podríamos tratar de fijarnos cuántos verbos emplean cada auxiliar. Para eso vamos a empezar a ver cómo emplear la librería de visualización de tidyverse, **ggplot2**.
+Como se dijo antes, tidyverse no es una librería única, sino un conjunto de las mismas con una serie de criterios de diseño en común. Ggplot2 es el núcleo de todas las librerías de tidyverse dirigidas a la representación visual de información, y tiene como peculiaridad que su sintaxis es levemente diferente al resto, fundamentalmente por usar el operador `+` para superponer capas en vez de `%>%` para concatenar operaciones.
+
+Para crear nuestro gráfico, lo primero que hacemos es invocar a la función `ggplot()` que se encarga de crear el sistema de coordenadas apropiado para el dataset que recibe como argumento. Después añadimos una **capa** consistente en el tipo de representación elegida para nuestros datos. Veamos cómo lucen los gráficos al emplear barras para visualizar las frecuencias:
+```{r}
+ggplot(tbl_regularity) +
+    geom_bar(aes(x = Auxiliary))
 ```
 
-```{r, warning = FALSE}
-# Representando cantidad de respuestas correctas en el Screening con tamaños.
-ggplot(data = comprension) +
-  geom_point(mapping = aes(x = Tecle.Correctas, y = Scr.Tiempo, size = Scr.Correctas))
+Lo siguiente a observar en el código invocado es el argumento `mapping`. Cada función *geom* toma un argumento `mapping` que define la manera en la que nuestras variables son representadas por diferentes parámetros visuales. Los *geoms* siempre toman un *aesthetic mapping* creado por `aes()` como el valor para `mapping`. `aes()` especifica las propiedades estéticas del gráfico, en este caso proyectamos la variable de nos interesaba, el auxiliar, sobre el argumento `x` de `aes()`. Hay más parámetros visuales que pueden representar la misma información, sin embargo, y en general vamos a tratar de ser visualmente redundantes en la generación de nuestros gráficos, lo cual implica que vamos a usar más de un único parámetro para representar una misma variable.
+```{r}
+ggplot(tbl_regularity) +
+    geom_bar(aes(x = Auxiliary, fill = Auxiliary))
 ```
 
-```{r, warning = FALSE}
-# Representando cantidad de respuestas correctas en el Screening con tranparencias.
-ggplot(data = comprension) +
-  geom_point(mapping = aes(x = Tecle.Correctas, y = Scr.Tiempo, alpha = Scr.Correctas))
+Si prestamos atención, vamos a notar que en ningún momento especificamos la altura de las barras. El propio `geom_bar()` computa la cantidad de ocurrencias de cada nivel de la variable y lo proyecta sobre el eje _y_ del gráfico. Nosotres podríamos, sin embargo, querer visualizar algún valor asociado diferente de la cantidad de ocurrencias del valor de una variable, o podríamos encontrar que tenemos una columna que ya da cuenta de la frecuencia de una variable, como es el caso de la columna _WrittenFrequency_ de nuestro dataset. Para eso necesitamos usar `geom_col()` en lugar de `geom_bar()` y especificar la variable que se proyecta sobre el eje _y_.
+
+```{r}
+ggplot(tbl_regularity) +
+    geom_col(aes(x = Verb, y = WrittenFrequency))
 ```
 
-```{r, warning = FALSE}
-# Representando escuela con formas.
-ggplot(data = comprension) +
-  geom_point(mapping = aes(x = Tecle.Correctas, y = Scr.Tiempo, shape = Escuela))
+Dado que el dataset contiene la información de alrededor de 700 verbos, resulta ilegible en estas condiciones, así que vamos a tomar sólo los diez verbos más frecuentes para graficar.
+
+```{r}
+mas_frec <- tbl_regularity %>% 
+    top_n(10, WrittenFrequency)
+
+mas_frec
 ```
 
-Como vimos en los ejemplos, una vez que seleccionamos un *aesthetic*, `ggplot2` se encarga del escalado de sus valores por nosotros.
+Además, si ponemos los verbos de manera longitudinal sobre el eje x es probable que se superpongan y no podamos leerlos, con lo cual vamos a emplear la función `coord_flip` para rotar el gráfico una vez definidas las proyecciones. También es necesario indicar que queremos que los verbos aparezcan ordenados del más al menos frecuente.
 
-# Facets
-
-Ya vimos como agregar una tercera variable usando *aesthetics*. Otra posibilidad (especialmente útil cuando se trata de una variable discreta) consiste en plotear una serie de gráficos. `ggplot2` nos permite dividir nuestro gráfico en *facets*. Para *facetar* nuestro ploteo, vamos a usar la función `facet_wrap()`. Como primer argumento vamos a pasar una fórmula que contenga nuestra variable relevante, y como argumento `nrow` vamos a pasar el número de filas:
-
-```{r, warning = FALSE}
-ggplot(data = comprension) +
-  geom_point(mapping = aes(x = Tecle.Correctas, y = Scr.Tiempo)) +
-  facet_wrap(~ Esc.Madre, nrow = 2)
+```{r}
+ggplot(mas_frec) +
+    geom_col(aes(x = reorder(Verb, WrittenFrequency), y = WrittenFrequency)) +
+    coord_flip()
 ```
 
-Si queremos facetar nuestro ploteo de acuerdo a dos variables, vamos a usar la función `facet_grid()`, que toma como argumento una fórmula que contiene dos variables:
+¿Qué pasó? _zeggen_ aparece muy por debajo de lo que debería estar y hay sólo 9 verbos en vez de 10. Si revisamos `mas_frec` vamos a ver que _zeggen_ aparece dos veces, pero con distintos valores en la columna de _VerbalSynsets_ (y potencialmente en alguna otra). Un plot que parece completamente anómalo puede ser útil para encontrar anomalías en los propios datos de origen.
 
-```{r, warning = FALSE}
-ggplot(data = comprension) +
-  geom_point(mapping = aes(x = Tecle.Correctas, y = Scr.Tiempo)) +
-  facet_grid(Escuela ~ Esc.Madre)
-``` 
+Volvamos a `geom_bar`. Tratemos de ver la cantidad de verbos con raíces del mismo largo.
 
-# Objetos geométricos
-
-Como ya adelantamos, `ggplot2` provee numerosos *geoms*. Un *geom* es el objeto geométrico que se usa para representar los valores relevantes. Para cambiar el *geom*, tenemos que cambiar la función *geom*:
-
-```{r, warning = FALSE}
-# Scatterplot:
-ggplot(data = comprension) +
-  geom_point(mapping = aes(x = Tecle.Correctas, y = Scr.Tiempo))
+```{r}
+ggplot(tbl_regularity) +
+    geom_bar(aes(x = NcountStem))
 ```
 
-```{r, message = FALSE, warning = FALSE}
-# Smoothed conditional means:
-ggplot(data = comprension) +
-  geom_smooth(mapping = aes(x = Tecle.Correctas, y = Scr.Tiempo))
+Podemos ver que el largo de las raíces va de 0 a 30 caracteres, pero podríamos tratar de agrupar esos valores. Para eso se vuelve necesario usar otro tipo de visualización, con su correspondiente `geom`.
+
+```{r}
+ggplot(tbl_regularity) +
+    geom_histogram(aes(x = NcountStem), bins = 10)
 ```
 
-No todos los *aesthetics* funcionan con todos los *geoms*. Por ejemplo, no podemos usar `shape` sobre una línea. En su lugar, podemos usar `linetype`:
+Un histograma supone la división de un rango de valores en varias porciones del mismo largo. En este caso, partimos el rango 0-30 en diez porciones de 3 (.033).
+Mientras que en la primera visualización encontrábamos picos en los valores 3 y 7, al agregar la información en secciones encontramos que la gran mayoría de los verbos posee raíces de 3, 4, o 5 letras. Los histogramas se vuelven más útiles a medida que el rango a dividir aumenta. Cuando se poseen observaciones en el rango de 0 a 200, por ejemplo, la visualización por columnas de ancho 1 se vuelve impracticable.
 
-```{r, message = FALSE, warning = FALSE}
-ggplot(data = comprension) +
-  geom_smooth(mapping = aes(x = Tecle.Correctas, y = Scr.Tiempo, linetype = Escuela))
-```
+### ¡Más en la próxima reunión!
 
-Si queremos mostrar distintos *geoms* en un mismo ploteo, los añadimos usando el operador `+` y `ggplot2` se va a ocupar de plotear cada *geom* sobre una capa distinta:
-
-```{r, message = FALSE, warning = FALSE}
-ggplot(data = comprension) +
-  geom_point(mapping = aes(x = Tecle.Correctas, y = Scr.Tiempo)) +
-  geom_smooth(mapping = aes(x = Tecle.Correctas, y = Scr.Tiempo))
-```
-
-Un buen hábito en programación consiste en reducir lo más posible el código repetido. De esta forma escribimos código que es más fácil de leer y menos propenso a errores cuando hacemos algún cambio. Podemos reducir el código duplicado pasando `mapping` como un argumento global para nuestro objeto `ggplot`:
-
-```{r, message = FALSE, warning = FALSE}
-ggplot(data = comprension, mapping = aes(x = Tecle.Correctas, y = Scr.Tiempo)) +
-  geom_point() +
-  geom_smooth()
-```
-
-El valor de `mapping` en la función `ggplot()` será considerado el valor por defecto para todos los *geoms*, pero nosotros podemos especificar aún más cada *geom*:
-
-```{r, message = FALSE, warning = FALSE}
-ggplot(data = comprension, mapping = aes(x = Tecle.Correctas, y = Scr.Tiempo)) +
-  geom_point(mapping = aes(color = Escuela)) +
-  geom_smooth()
-```
-
-# Transformaciones estadísticas
-
-`geom_point()` trabaja con nuestros datos "crudos", pero otros *geoms* transforman nuestros datos antes de plotear. `geom_bar()`, por ejemplo, plotea un diagrama de barras donde el eje *y* representa la cantidad de observaciones para un determinado nivel de la variable independiente:
-
-```{r, warning = FALSE}
-ggplot(data = comprension) +
-  geom_bar(mapping = aes(x = Scr.Correctas))
-```
-
-El algoritmo usado para calcular valores nuevos para un gráfico se llama *stat* (forma corta de *statistical transformation*). Cada *geom* tiene un *stat* por defecto y cada *stat* tiene un *geom* por defecto. El *stat* por defecto para `geom_bar()` es `stat_count()` y el *geom* por defecto para `stat_count()` es `geom_bar()`. Por eso, podemos recrear el gráfico de recién usando `stat_count()` en lugar de `geom_bar()`:
-
-```{r, warning = FALSE}
-ggplot(data = comprension) +
-  stat_count(mapping = aes(x = Scr.Correctas))
-```
-
-`stat_summary()`, por ejemplo, resume los valores de *y* para cada valor de *x*. Por ejemplo, el siguiente código resume los valores del tiempo de resolución del Screening, para cada nivel de la variable de escolaridad de la madre:
-
-```{r, warning = FALSE}
-ggplot(data = comprension) +
-  stat_summary(
-  mapping = aes(x = Esc.Madre, y = Scr.Tiempo),
-  fun.ymin = min,
-  fun.ymax = max,
-  fun.y = median
-  )
-```
-
-# Posiciones
-
-Para colorear un diagrama de barras, vamos a usar el *aesthetic* `fill`:
-
-```{r, warning = FALSE}
-ggplot(data = comprension) +
-  geom_bar(mapping = aes(x = Esc.Madre, fill = Esc.Madre))
-```
-
-A su vez, podemos pasar una tercera variable como valor de `fill`:
-
-```{r, warning = FALSE}
-ggplot(data = comprension) +
-  geom_bar(mapping = aes(x = Scr.Correctas, fill = Orig.Madre))
-```
-
-El *stacking* ocurre de forma automática según el valor del argumento `position`:
-
-```{r, warning = FALSE}
-ggplot(data = comprension) +
-  geom_bar(
-    mapping = aes(x = Scr.Correctas, fill = Orig.Madre),
-    position = "fill"
-  )
-```
-
-```{r, warning = FALSE}
-ggplot(data = comprension) +
-  geom_bar(
-    mapping = aes(x = Scr.Correctas, fill = Orig.Madre),
-    position = "dodge"
-  )
-```
-
-# Sitemas de coordenadas
-
-El sistema de coordenadas por defecto es el sistema de coordenadas cartesiano, pero existen otros sistemas de coordenadas que, en ocasiones, pueden resultar útiles:
-
-```{r, warning = FALSE}
-# Si bien no es el caso, rotar los ejes x e y, como hacemos en este gráfico,
-# resulta especialmente útil cuando nuestras etiquetas son muy largas. En estos
-# casos, si ploteamos las etiquetas bajo el eje x, lo más probable es que las
-# etiquetas se superpongan.
-ggplot(data = comprension, mapping = aes(x = Esc.Madre, y = Scr.Tiempo)) +
-  geom_boxplot() +
-  coord_flip()
-```
-
-```{r, message = FALSE}
-ar <- map_data("world", region=c("arg", "falk", "south georgia", "south sandwich"))
-
-ggplot(ar, aes(long, lat, group = group)) +
-  geom_polygon(fill = "white", color = "black") + 
-  coord_quickmap()
-```
-
-```{r, warning = FALSE}
-ggplot(data = comprension) +
-  geom_bar(
-    mapping = aes(x = Esc.Madre, fill = Esc.Madre),
-    show.legend = FALSE,
-    width = 1
-  ) +
-  theme(aspect.ratio = 1) +
-  labs(x = NULL, y = NULL) +
-  coord_polar()
-```
-
-# Conclusión
-
-`ggplot2` es un paquete muy versátil que nos permite ajustar los gráficos a nuestras necesidades siguiendo una sintaxis muy simple, que repetimos a continuación:
-
-```
-ggplot(data = <DATA>) +
-  <GEOM_FUNCTION>(
-    mapping = aes(<MAPPINGS>),
-    stat = <STAT>,
-    position = <POSITION>
-  ) + 
-  <COORDINATE_FUNCTION> +
-  <FACET_FUNCTION>
-```
-
-En total son 7 los parámetros que podemos ajustar para personalizar nuestros gráficos, pero en la práctica son raras las veces en las que necesitamos especificar los 7 parámetros. `ggplot2` provee opciones por defecto útiles, pero si necesitamos cambiar algo siempre podemos hacerlo.
-
-# Bibliografía consultada
+### Bibliografía
