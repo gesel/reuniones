@@ -391,7 +391,7 @@ $(document).ready(function () {
 <pre class="r"><code>var_numerica &lt;- 100
 print(var_numerica)</code></pre>
 <pre><code>## [1] 100</code></pre>
-<pre class="r"><code>var_caracter &lt;- 'cien'
+<pre class="r"><code>var_caracter &lt;- &#39;cien&#39;
 print(var_caracter)</code></pre>
 <pre><code>## [1] &quot;cien&quot;</code></pre>
 <pre class="r"><code>var_vector &lt;- c(var_numerica, var_caracter)
@@ -433,14 +433,14 @@ print(var_factor)</code></pre>
 <p>Hay veces, incluso, que algunos argumentos opcionales se hallan definidos por defecto y su valor sólo puede modificarse de manera explícita al ejecutar la función.</p>
 <p>Más allá de las funcionalidades que provee R por defecto, el lenguaje puede ampliarse. Cuando une usuarie o grupo escribe código que permite realizar de manera más sencilla un procedimiento determinado, puede organizarlo y compartirlo en forma de <strong>librería</strong> o paquete. Las librerías son conjuntos de funciones y tipos de datos creados por usuario que extienden las capacidades del lenguaje de programación.</p>
 <p>Esto nos resulta de importancia por una serie de razones. La primera es que muchísimos análisis estadísticos se hallan disponibles en librerías, pero no forman parte del núcleo básico de R, con lo cual para llevarlos a cabo es necesario descargar la librería en cuesión o programar a mano la lógica del análisis. En la medida de lo posible, vamos a evitar hacer a mano lo que otras personas ya hayan hecho mejor que nosotres. En segundo lugar, ocurre que los criterios de diseño de código varían entre programadores, con lo cual hay variaciones en el modo en el que las librerías nombran a las clases y funciones, la forma en la que se definen los argumentos, y la propia manera en la que se ejectuan los análisis. En nuestras reuniones vamos a procurar emplear el conjunto de librerías llamado <strong>tidyverse</strong>, cuya sintaxis es levemente diferente a la de R básico y que emplea tipos de datos adicionales. En particular, nos importa la clase <strong>tibble</strong>, que vamos a usar en lugar del data frame que viene por defecto con R. Si bien las diferencias entre un tibble y un data frame no son aparentes, en realidad tibble es una extensión del data frame: puede hacer todo lo que se hace con data frame común, y algunas cosas más.</p>
-<p>Para instalar una librería en R es necesario correr desde la consola la función <code>install.packages('NOMBRE DE LA LIBRERÍA)</code>, la cual se ocupa de buscar en línea el paquete, descargarlo e instalar todas sus dependencias. Luego, para incorporar la funcionalidad de la librería al análisis que estemos llevando a cabo, la llamamos explícitamente en la parte superior de nuestro código. Eso nos permitirá emplear sus recursos de manera inmediata.</p>
+<p>Para instalar una librería en R es necesario correr desde la consola la función <code>install.packages(&#39;NOMBRE DE LA LIBRERÍA)</code>, la cual se ocupa de buscar en línea el paquete, descargarlo e instalar todas sus dependencias. Luego, para incorporar la funcionalidad de la librería al análisis que estemos llevando a cabo, la llamamos explícitamente en la parte superior de nuestro código. Eso nos permitirá emplear sus recursos de manera inmediata.</p>
 <pre class="r"><code>library(tidyverse)</code></pre>
-<pre><code>## ── Attaching packages ─────────────────────────────── tidyverse 1.2.1 ──</code></pre>
+<pre><code>## ── Attaching packages ────────────────────────────── tidyverse 1.2.1 ──</code></pre>
 <pre><code>## ✔ ggplot2 2.2.1     ✔ purrr   0.2.5
 ## ✔ tibble  1.4.2     ✔ dplyr   0.7.5
 ## ✔ tidyr   0.8.1     ✔ stringr 1.3.1
 ## ✔ readr   1.1.1     ✔ forcats 0.3.0</code></pre>
-<pre><code>## ── Conflicts ────────────────────────────────── tidyverse_conflicts() ──
+<pre><code>## ── Conflicts ───────────────────────────────── tidyverse_conflicts() ──
 ## ✖ dplyr::filter() masks stats::filter()
 ## ✖ dplyr::lag()    masks stats::lag()</code></pre>
 <pre class="r"><code>tbl_iris &lt;- as_tibble(iris)
@@ -475,11 +475,11 @@ print(tbl_iris)</code></pre>
 <pre class="r"><code>mean(tbl_iris$Petal.Length)</code></pre>
 <pre><code>## [1] 3.758</code></pre>
 <p>Si luego quisiéramos ver el promedio del largo del pétalo para cada especie de iris (setosa, versicolor y virginica), tendríamos que hacer lo siguiente:</p>
-<pre class="r"><code>mean(tbl_iris[tbl_iris$Species == 'setosa',]$Petal.Length)</code></pre>
+<pre class="r"><code>mean(tbl_iris[tbl_iris$Species == &#39;setosa&#39;,]$Petal.Length)</code></pre>
 <pre><code>## [1] 1.462</code></pre>
-<pre class="r"><code>mean(tbl_iris[tbl_iris$Species == 'versicolor',]$Petal.Length)</code></pre>
+<pre class="r"><code>mean(tbl_iris[tbl_iris$Species == &#39;versicolor&#39;,]$Petal.Length)</code></pre>
 <pre><code>## [1] 4.26</code></pre>
-<pre class="r"><code>mean(tbl_iris[tbl_iris$Species == 'virginica',]$Petal.Length)</code></pre>
+<pre class="r"><code>mean(tbl_iris[tbl_iris$Species == &#39;virginica&#39;,]$Petal.Length)</code></pre>
 <pre><code>## [1] 5.552</code></pre>
 <p>El código de tidyverse es, en cambio, un tanto más organizado y fácil de seguir:</p>
 <pre class="r"><code>tbl_iris %&gt;% 
@@ -495,6 +495,13 @@ print(tbl_iris)</code></pre>
 <pre class="r"><code>tbl_promedio_PetalLength &lt;- tbl_iris %&gt;% 
     group_by(Species) %&gt;%
     summarise(promedio_PetalLength = mean(Petal.Length))</code></pre>
+<p><strong>NOTA</strong>: Hay maneras más sencillas de hacer las cosas en R base:</p>
+<pre class="r"><code>mean &lt;- tapply(iris$Petal.Length, iris$Species, mean)
+mean_df &lt;- as.data.frame(mean)</code></pre>
+<p>Las cosas se vuelven levemente más problemáticas a la hora de encadenar más operaciones:</p>
+<pre class="r"><code>mean &lt;- tapply(iris$Petal.Length, iris$Species, mean)
+sd &lt;- tapply(iris$Petal.Length, iris$Species, sd)
+mean_sd_df &lt;- cbind(mean, sd)</code></pre>
 <p>Esto se vuelve particularmente relevante si queremos computar varias cosas de manera organizada. ¿Cómo se les ocurre que sería el código de R base para lo siguiente?</p>
 <pre class="r"><code>tbl_resumen &lt;- tbl_iris %&gt;% 
     group_by(Species) %&gt;%
