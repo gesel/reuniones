@@ -497,11 +497,21 @@ print(tbl_iris)</code></pre>
     summarise(promedio_PetalLength = mean(Petal.Length))</code></pre>
 <p><strong>NOTA</strong>: Hay maneras más sencillas de hacer las cosas en R base:</p>
 <pre class="r"><code>mean &lt;- tapply(iris$Petal.Length, iris$Species, mean)
-mean_df &lt;- as.data.frame(mean)</code></pre>
+mean_df &lt;- as.data.frame(mean)
+print(mean_df)</code></pre>
+<pre><code>##             mean
+## setosa     1.462
+## versicolor 4.260
+## virginica  5.552</code></pre>
 <p>Las cosas se vuelven levemente más problemáticas a la hora de encadenar más operaciones:</p>
 <pre class="r"><code>mean &lt;- tapply(iris$Petal.Length, iris$Species, mean)
 sd &lt;- tapply(iris$Petal.Length, iris$Species, sd)
-mean_sd_df &lt;- cbind(mean, sd)</code></pre>
+mean_sd_df &lt;- cbind(mean, sd)
+print(mean_sd_df)</code></pre>
+<pre><code>##             mean        sd
+## setosa     1.462 0.1736640
+## versicolor 4.260 0.4699110
+## virginica  5.552 0.5518947</code></pre>
 <p>Esto se vuelve particularmente relevante si queremos computar varias cosas de manera organizada. ¿Cómo se les ocurre que sería el código de R base para lo siguiente?</p>
 <pre class="r"><code>tbl_resumen &lt;- tbl_iris %&gt;% 
     group_by(Species) %&gt;%

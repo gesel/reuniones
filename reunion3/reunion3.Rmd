@@ -115,6 +115,7 @@ __NOTA__: Hay maneras más sencillas de hacer las cosas en R base:
 ```{r}
 mean <- tapply(iris$Petal.Length, iris$Species, mean)
 mean_df <- as.data.frame(mean)
+print(mean_df)
 ```
 Las cosas se vuelven levemente más problemáticas a la hora de encadenar más operaciones:
 
@@ -122,6 +123,7 @@ Las cosas se vuelven levemente más problemáticas a la hora de encadenar más o
 mean <- tapply(iris$Petal.Length, iris$Species, mean)
 sd <- tapply(iris$Petal.Length, iris$Species, sd)
 mean_sd_df <- cbind(mean, sd)
+print(mean_sd_df)
 ```
 
 Esto se vuelve particularmente relevante si queremos computar varias cosas de manera organizada. ¿Cómo se les ocurre que sería el código de R base para lo siguiente?
