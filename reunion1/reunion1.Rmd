@@ -1,15 +1,15 @@
 ---
-author: Federico Álvarez
 title: Una breve introducción a las aplicaciones de la estadística en los estudios del lenguaje
+author: Federico Álvarez
 date: 23 de agosto de 2018
-email: federicoalvarez.puan@gmail.com
-bibliography: bibliografia.bib
-lang: es
 output:
   html_document:
+    css: ../styles.css
     number_sections: yes
     theme: yeti
-    css: ../styles.css
+  pdf_document: default
+lang: es
+bibliography: bibliografia.bib
 --- 
 
 A lo largo de su historia la tradición lingüística ha mantenido, mayormente, un enfoque cualitativo en el abordaje de su objeto de estudio. Por diferentes razones (algunas de las cuales pueden rastrearse en la bilbiografía, otras pueden tener más que ver con la apreciación personal de cada investigador) los estudios del lenguaje no han aplicado de manera extensiva herramientas cuantitativas para articular sus hipótesis, a diferencia de la mayoría de las disciplinas científicas (posiblemente la psicolingüística y la neurolingüística sean una excepción, si bien es discutible el grado de participación de los lingüistas en el análisis estadístico de sus experimentos). Esta tendencia se ha ido revirtiendo durante las últimas décadas, y al día de hoy podemos encontrar una gran cantidad de ejemplos de estudios que hacen uso de modelos estadísticos para comprobar sus predicciones e incluso para formularlas. Sin embargo, al menos en nuestro país esta renovación en la metodología no ha sido acompañada por un cambio en los programas de estudios de las carreras de lingüística, lo cual es comprensible en tanto el estudio del lenguaje está aún asociado al estudio de la literatura y no constituye una carrera aparte en la esfera universitaria. Uno de los problemas que se derivan de esta situación es que aquellos lingüistas interesados en adoptar una metodología con una base matemática más sólida no tenemos un andamiaje institucional que facilite el abordaje de la temática. Este trabajo, entonces, se ofrece como un repaso sobre las bases y requisitos de un enfoque cuantitativo, y las áreas donde este tipo de enfoque puede ser de utilidad en el campo disciplinar de la lingüística.
@@ -94,7 +94,7 @@ Espero que al llegar a este punto no resulte abrumadora la cantidad de puntos de
 
 En tanto el abordaje estadístico está íntimamente ligado al empleo de herramientas computacionales, considero que la afirmación de arriba es más apropiada para referirse al abordaje cuantitativo que al computacional per se. El uso de herramientas computacionales permite una recolección masiva de datos y una aplicación extensiva de análisis de cualquier tipo, por lo que el giro conceptual no se sitúa tanto en la posibilidad de extraer datos sino en las posibilidades de refinamiento teórico que proporciona una metodología cuantitativa, en consonancia con el resto de la ciencia contemporánea.
 
-# Nota
+# Licencia
 
 Este trabajo es de distribución gratuita, y se encuentra licenciado bajo [Creative Commons Atribución-NoComercial-SinDerivadas 4.0 Internacional (CC BY-NC-ND 4.0)](https://creativecommons.org/licenses/by-nc-nd/4.0/deed.es).
 

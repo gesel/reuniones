@@ -1,5 +1,5 @@
 ---
-author: Federico Alvarez y Santiago Gualchi
+author: Santiago Gualchi
 title: Visualización de datos en R
 date: 20 de septiembre de 2018
 email: santiagogualchi@gmail.com

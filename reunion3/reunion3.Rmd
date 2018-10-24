@@ -1,16 +1,17 @@
 ---
 title: "Introducción a R, estadística descriptiva y visualización exploratoria de datos"
-author: "Federico Alvarez y Santiago Gualchi"
+author: "Federico Alvarez"
 date: "20 de septiembre de 2018"
-email: federicoalvarez.puan@gmail.com, santiagogualchi@gmail.com
-bibliography: bibliografia.bib
-lang: es
 output:
+  pdf_document: default
   html_document:
-    theme: yeti
     css: ../styles.css
+    theme: yeti
+lang: es
 nocite: |
   @r4ds2017
+email: federicoalvarez.puan@gmail.com
+bibliography: bibliografia.bib
 ---
 
 ```{r setup, include=FALSE}
@@ -75,7 +76,7 @@ Esto nos resulta de importancia por una serie de razones. La primera es que much
 
 Para instalar una librería en R es necesario correr desde la consola la función `install.packages('NOMBRE DE LA LIBRERÍA)`, la cual se ocupa de buscar en línea el paquete, descargarlo e instalar todas sus dependencias. Luego, para incorporar la funcionalidad de la librería al análisis que estemos llevando a cabo, la llamamos explícitamente en la parte superior de nuestro código. Eso nos permitirá emplear sus recursos de manera inmediata.
 
-```{r}
+```{r include=FALSE}
 library(tidyverse)
 
 tbl_iris <- as_tibble(iris)
